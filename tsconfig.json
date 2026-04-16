@@ -6,14 +6,15 @@
     "rootDir": "./src",
     "moduleResolution": "NodeNext",
     "baseUrl": "./",
-    "sourceMap": true,
     "outDir": "./dist",
     "noImplicitAny": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "newLine": "lf"
+    "newLine": "lf",
+    "declaration": false,
+    "declarationMap": false
   },
   "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage"]
 }
