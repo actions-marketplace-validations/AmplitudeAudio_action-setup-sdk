@@ -1,13 +1,17 @@
 type Platform =
-  | 'arm64-osx'
-  | 'x64-osx'
-  | 'arm64-linux'
-  | 'x64-linux'
-  | 'x64-win'
-  | 'arm64-win'
-  | 'x64-mingw-static'
+  | 'x64-windows'
+  | 'x86_64-linux'
+  | 'x86_64-linux-clang'
+  | 'x86_64-macosx'
+  | 'arm64-macosx'
+  | 'x86_64-android'
+  | 'arm64-v8a-android'
+  | 'x86-android'
+  | 'armeabi-v7a-android'
+  | 'arm64-iphoneos'
+  | 'x86_64-iphoneos'
 
-type Version = 'nightly' | 'latest' | `v${number}.${number}.${number}`
+type Version = 'nightly' | `v${number}.${number}.${number}`
 
 type Artifact = {
   id: number
@@ -27,4 +31,14 @@ type Artifact = {
     head_branch: string
     head_sha: string
   }
+}
+
+type ReleaseAsset = {
+  name: string
+  browser_download_url: string
+}
+
+type Release = {
+  tag_name: string
+  assets: ReleaseAsset[]
 }

@@ -28,6 +28,10 @@ describe('action', () => {
       switch (name) {
         case 'version':
           return 'nightly'
+        case 'config':
+          return 'debug'
+        case 'install-dir':
+          return './amplitude_audio'
         default:
           return ''
       }
@@ -36,7 +40,7 @@ describe('action', () => {
     core.getMultilineInput.mockImplementation((name: string): string[] => {
       switch (name) {
         case 'platforms':
-          return ['x64-windows', 'arm64-osx']
+          return ['x64-windows', 'arm64-macosx']
         default:
           return []
       }
@@ -60,6 +64,10 @@ describe('action', () => {
       switch (name) {
         case 'version':
           return 'nightly'
+        case 'config':
+          return 'debug'
+        case 'install-dir':
+          return './amplitude_audio'
         default:
           return ''
       }
@@ -68,7 +76,7 @@ describe('action', () => {
     core.getMultilineInput.mockImplementation((name: string): string[] => {
       switch (name) {
         case 'platforms':
-          return ['x86-windows', 'arm64-osx']
+          return ['x86-windows', 'arm64-macosx']
         default:
           return []
       }
@@ -83,6 +91,33 @@ describe('action', () => {
     expect(core.setFailed).toHaveBeenNthCalledWith(
       1,
       'No x86-windows nightly build found'
+    )
+  })
+
+  it('sets a failed status on unsupported version', async () => {
+    core.getInput.mockImplementation((name: string): string => {
+      switch (name) {
+        case 'version':
+          return 'invalid'
+        default:
+          return ''
+      }
+    })
+
+    core.getMultilineInput.mockImplementation((name: string): string[] => {
+      switch (name) {
+        case 'platforms':
+          return ['x64-windows']
+        default:
+          return []
+      }
+    })
+
+    await run()
+
+    expect(core.setFailed).toHaveBeenNthCalledWith(
+      1,
+      'Unsupported version: invalid'
     )
   })
 })
