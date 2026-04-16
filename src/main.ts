@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { download } from './download'
+import { download } from './download.js'
 
 /**
  * The main function for the action.
