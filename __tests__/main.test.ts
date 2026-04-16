@@ -1,52 +1,30 @@
 /**
  * Unit tests for the action's main functionality, src/main.ts
  *
- * These should be run as if the action was called from a workflow.
- * Specifically, the inputs listed in `action.yml` should be set as environment
- * variables following the pattern `INPUT_<INPUT_NAME>`.
+ * To mock dependencies in ESM, we use __fixtures__ that export mock
+ * functions and jest.unstable_mockModule() with dynamic imports.
  */
+import { jest } from '@jest/globals'
+import * as core from '../__fixtures__/core.js'
+import * as tc from '../__fixtures__/tool-cache.js'
 
-import * as core from '@actions/core'
-import * as tc from '@actions/tool-cache'
-import * as main from '../src/main'
+// Mocks must be declared before the module being tested is imported.
+jest.unstable_mockModule('@actions/core', () => core)
+jest.unstable_mockModule('@actions/tool-cache', () => tc)
 
-// Mock the action's main function
-const runMock = jest.spyOn(main, 'run')
-
-// Mock the GitHub Actions core library
-let debugMock: jest.SpiedFunction<typeof core.debug>
-let errorMock: jest.SpiedFunction<typeof core.error>
-let getInputMock: jest.SpiedFunction<typeof core.getInput>
-let getMultilineInputMock: jest.SpiedFunction<typeof core.getMultilineInput>
-let setFailedMock: jest.SpiedFunction<typeof core.setFailed>
-let setOutputMock: jest.SpiedFunction<typeof core.setOutput>
-
-let downloadToolMock: jest.SpiedFunction<typeof tc.downloadTool>
-let extractZipMock: jest.SpiedFunction<typeof tc.extractZip>
+// The module being tested must be imported dynamically so mocks are applied.
+const { run } = await import('../src/main.js')
 
 describe('action', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    debugMock = jest.spyOn(core, 'debug').mockImplementation()
-    errorMock = jest.spyOn(core, 'error').mockImplementation()
-    getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
-    getMultilineInputMock = jest
-      .spyOn(core, 'getMultilineInput')
-      .mockImplementation()
-    setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
-    setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
-
-    downloadToolMock = jest.spyOn(tc, 'downloadTool').mockImplementation()
-    extractZipMock = jest.spyOn(tc, 'extractZip').mockImplementation()
-
-    downloadToolMock.mockImplementation(async () => 'path/to/sdk.zip')
-    extractZipMock.mockImplementation(async () => 'path/to/sdk')
+    tc.downloadTool.mockResolvedValue('path/to/sdk.zip')
+    tc.extractZip.mockResolvedValue('path/to/sdk')
   })
 
   it('downloads the nightly artifacts', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    core.getInput.mockImplementation((name: string): string => {
       switch (name) {
         case 'version':
           return 'nightly'
@@ -55,7 +33,7 @@ describe('action', () => {
       }
     })
 
-    getMultilineInputMock.mockImplementation(name => {
+    core.getMultilineInput.mockImplementation((name: string): string[] => {
       switch (name) {
         case 'platforms':
           return ['x64-windows', 'arm64-osx']
@@ -64,25 +42,22 @@ describe('action', () => {
       }
     })
 
-    await main.run()
-    expect(runMock).toHaveReturned()
+    await run()
 
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(
+    expect(core.debug).toHaveBeenNthCalledWith(
       1,
       'Retrieving artifacts from GitHub Actions'
     )
-    expect(setOutputMock).toHaveBeenNthCalledWith(
+    expect(core.setOutput).toHaveBeenNthCalledWith(
       2,
       'path',
       expect.stringContaining('sdk')
     )
-    expect(errorMock).not.toHaveBeenCalled()
+    expect(core.error).not.toHaveBeenCalled()
   }, 10000)
 
   it('sets a failed status on unknown platform', async () => {
-    // Set the action's inputs as return values from core.getInput()
-    getInputMock.mockImplementation(name => {
+    core.getInput.mockImplementation((name: string): string => {
       switch (name) {
         case 'version':
           return 'nightly'
@@ -91,7 +66,7 @@ describe('action', () => {
       }
     })
 
-    getMultilineInputMock.mockImplementation(name => {
+    core.getMultilineInput.mockImplementation((name: string): string[] => {
       switch (name) {
         case 'platforms':
           return ['x86-windows', 'arm64-osx']
@@ -100,15 +75,13 @@ describe('action', () => {
       }
     })
 
-    await main.run()
-    expect(runMock).toHaveReturned()
+    await run()
 
-    // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(
+    expect(core.debug).toHaveBeenNthCalledWith(
       1,
       'Retrieving artifacts from GitHub Actions'
     )
-    expect(setFailedMock).toHaveBeenNthCalledWith(
+    expect(core.setFailed).toHaveBeenNthCalledWith(
       1,
       'No x86-windows nightly build found'
     )
