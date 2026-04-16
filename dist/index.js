@@ -28113,6 +28113,24 @@ var ExitCode;
      */
     ExitCode[ExitCode["Failure"] = 1] = "Failure";
 })(ExitCode || (ExitCode = {}));
+//-----------------------------------------------------------------------
+// Variables
+//-----------------------------------------------------------------------
+/**
+ * Sets env variable for this action and future actions in the job
+ * @param name the name of the variable to set
+ * @param val the value of the variable. Non-string values will be converted to a string via JSON.stringify
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function exportVariable(name, val) {
+    const convertedVal = toCommandValue(val);
+    process.env[name] = convertedVal;
+    const filePath = process.env['GITHUB_ENV'] || '';
+    if (filePath) {
+        return issueFileCommand('ENV', prepareKeyValueMessage(name, val));
+    }
+    issueCommand('set-env', { name }, convertedVal);
+}
 /**
  * Prepends inputPath to the PATH (for this action and future actions)
  * @param inputPath
@@ -57744,9 +57762,11 @@ async function downloadNightly(platforms) {
         }
         const downloadedPath = await toolCacheExports.downloadTool(artifact.archive_download_url, undefined, headers.Authorization);
         const extractedFolder = await toolCacheExports.extractZip(downloadedPath, installDir);
-        addPath(extractedFolder);
-        info(`Downloaded ${platform} nightly build to ${extractedFolder}`);
-        setOutput('path', path.normalize(extractedFolder));
+        const sdkPath = path.resolve(extractedFolder);
+        addPath(sdkPath);
+        exportVariable('AM_SDK_PATH', sdkPath);
+        info(`Downloaded ${platform} nightly build to ${sdkPath}`);
+        setOutput('path', sdkPath);
     }
 }
 async function downloadRelease(platforms, version) {
@@ -57768,10 +57788,11 @@ async function downloadRelease(platforms, version) {
         }
         const downloadedPath = await toolCacheExports.downloadTool(asset.browser_download_url, undefined, headers.Authorization);
         execFileSync('7z', ['x', downloadedPath, `-o${installDir}`, '-y']);
-        const extractedFolder = path.normalize(installDir);
-        addPath(extractedFolder);
-        info(`Downloaded ${platform} ${version} build to ${extractedFolder}`);
-        setOutput('path', extractedFolder);
+        const sdkPath = path.resolve(installDir);
+        addPath(sdkPath);
+        exportVariable('AM_SDK_PATH', sdkPath);
+        info(`Downloaded ${platform} ${version} build to ${sdkPath}`);
+        setOutput('path', sdkPath);
     }
 }
 
