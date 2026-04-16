@@ -57762,11 +57762,12 @@ async function downloadNightly(platforms) {
         }
         const downloadedPath = await toolCacheExports.downloadTool(artifact.archive_download_url, undefined, headers.Authorization);
         const extractedFolder = await toolCacheExports.extractZip(downloadedPath, installDir);
-        const sdkPath = path.resolve(extractedFolder);
-        addPath(sdkPath);
+        const installPath = path.resolve(extractedFolder);
+        const sdkPath = path.join(installPath, 'sdk');
+        addPath(installPath);
         exportVariable('AM_SDK_PATH', sdkPath);
-        info(`Downloaded ${platform} nightly build to ${sdkPath}`);
-        setOutput('path', sdkPath);
+        info(`Downloaded ${platform} nightly build to ${installPath}`);
+        setOutput('path', installPath);
     }
 }
 async function downloadRelease(platforms, version) {
@@ -57788,11 +57789,12 @@ async function downloadRelease(platforms, version) {
         }
         const downloadedPath = await toolCacheExports.downloadTool(asset.browser_download_url, undefined, headers.Authorization);
         execFileSync('7z', ['x', downloadedPath, `-o${installDir}`, '-y']);
-        const sdkPath = path.resolve(installDir);
-        addPath(sdkPath);
+        const installPath = path.resolve(installDir);
+        const sdkPath = path.join(installPath, 'sdk');
+        addPath(installPath);
         exportVariable('AM_SDK_PATH', sdkPath);
-        info(`Downloaded ${platform} ${version} build to ${sdkPath}`);
-        setOutput('path', sdkPath);
+        info(`Downloaded ${platform} ${version} build to ${installPath}`);
+        setOutput('path', installPath);
     }
 }
 

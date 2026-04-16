@@ -65,12 +65,13 @@ async function downloadNightly(platforms: Platform[]): Promise<void> {
     )
     const extractedFolder = await tc.extractZip(downloadedPath, installDir)
 
-    const sdkPath = path.resolve(extractedFolder)
+    const installPath = path.resolve(extractedFolder)
+    const sdkPath = path.join(installPath, 'sdk')
 
-    core.addPath(sdkPath)
+    core.addPath(installPath)
     core.exportVariable('AM_SDK_PATH', sdkPath)
-    core.info(`Downloaded ${platform} nightly build to ${sdkPath}`)
-    core.setOutput('path', sdkPath)
+    core.info(`Downloaded ${platform} nightly build to ${installPath}`)
+    core.setOutput('path', installPath)
   }
 }
 
@@ -111,11 +112,12 @@ async function downloadRelease(
 
     execFileSync('7z', ['x', downloadedPath, `-o${installDir}`, '-y'])
 
-    const sdkPath = path.resolve(installDir)
+    const installPath = path.resolve(installDir)
+    const sdkPath = path.join(installPath, 'sdk')
 
-    core.addPath(sdkPath)
+    core.addPath(installPath)
     core.exportVariable('AM_SDK_PATH', sdkPath)
-    core.info(`Downloaded ${platform} ${version} build to ${sdkPath}`)
-    core.setOutput('path', sdkPath)
+    core.info(`Downloaded ${platform} ${version} build to ${installPath}`)
+    core.setOutput('path', installPath)
   }
 }
