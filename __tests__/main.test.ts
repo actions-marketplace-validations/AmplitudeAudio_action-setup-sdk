@@ -48,8 +48,7 @@ describe('action', () => {
       1,
       'Retrieving artifacts from GitHub Actions'
     )
-    expect(core.setOutput).toHaveBeenNthCalledWith(
-      2,
+    expect(core.setOutput).toHaveBeenLastCalledWith(
       'path',
       expect.stringContaining('sdk')
     )

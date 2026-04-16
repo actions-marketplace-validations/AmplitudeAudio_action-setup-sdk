@@ -3,7 +3,6 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
-    "rootDir": "./src",
     "moduleResolution": "NodeNext",
     "baseUrl": "./",
     "outDir": "./dist",
@@ -11,10 +10,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "newLine": "lf",
     "declaration": false,
     "declarationMap": false
   },
-  "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage"]
+  "include": ["src"],
+  "exclude": ["__fixtures__", "__tests__", "coverage", "dist", "node_modules"]
 }

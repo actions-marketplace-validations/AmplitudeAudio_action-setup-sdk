@@ -47,8 +47,7 @@ export default [
           allowDefaultProject: [
             '__tests__/*.ts',
             'eslint.config.mjs',
-            'jest.config.js',
-            'rollup.config.ts'
+            'jest.config.js'
           ]
         },
         tsconfigRootDir: import.meta.dirname
