@@ -22,15 +22,15 @@ steps:
     id: checkout
     uses: actions/checkout@v4
 
-  - name: Test Local Action
+  - name: Setup Amplitude Audio SDK
     id: setup-sdk
-    uses: AmplitudeAudio/action-setup-sdk@v1
+    uses: AmplitudeAudio/action-setup-sdk@main
     with:
       platforms: | # The list of platforms you want to install
         x64-windows
-        x64-linux
-        x64-osx
-      version: nightly # The SDK version to install
+        x86_64-linux
+        arm64-macosx
+      version: nightly # The SDK version to install. Use "nightly" or a release tag like "v1.0.0"
       install-dir: ./amplitude_audio # Where to install the SDK. Can be relative or absolute
       config: release # The SDK build configuration to install. Either release or debug
     env:
@@ -42,6 +42,37 @@ steps:
     id: output
     run: echo "${{ steps.setup-sdk.outputs.path }}" # The action outputs the install dir in a `path` field
 ```
+
+## Supported Platforms
+
+| Platform              | Identifier            |
+| --------------------- | --------------------- |
+| Windows (x64, MSVC)   | `x64-windows`         |
+| Linux (x86_64, GCC)   | `x86_64-linux`        |
+| Linux (x86_64, Clang) | `x86_64-linux-clang`  |
+| macOS (x86_64)        | `x86_64-macosx`       |
+| macOS (arm64)         | `arm64-macosx`        |
+| Android (x86_64)      | `x86_64-android`      |
+| Android (arm64-v8a)   | `arm64-v8a-android`   |
+| Android (x86)         | `x86-android`         |
+| Android (armeabi-v7a) | `armeabi-v7a-android` |
+| iOS (arm64)           | `arm64-iphoneos`      |
+| iOS (x86_64)          | `x86_64-iphoneos`     |
+
+## Inputs
+
+| Input         | Description                                                                              | Required | Default             |
+| ------------- | ---------------------------------------------------------------------------------------- | -------- | ------------------- |
+| `platforms`   | The list of SDK platforms to install (multiline)                                         | Yes      | -                   |
+| `version`     | The SDK version. Use `nightly` for latest develop builds, or a release tag like `v1.0.0` | Yes      | `nightly`           |
+| `install-dir` | The directory where to install the SDK                                                   | No       | `./amplitude_audio` |
+| `config`      | The build configuration. Either `debug` or `release`                                     | Yes      | `debug`             |
+
+## Outputs
+
+| Output | Description                               |
+| ------ | ----------------------------------------- |
+| `path` | The path where the SDK has been installed |
 
 ## License
 

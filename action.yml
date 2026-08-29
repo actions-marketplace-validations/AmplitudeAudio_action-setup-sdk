@@ -10,10 +10,16 @@ branding:
 
 inputs:
   platforms:
-    description: 'The list of SDK platforms to install'
+    description:
+      'The list of SDK platforms to install. Use exact CI identifiers:
+      x64-windows, x86_64-linux, x86_64-linux-clang, x86_64-macosx,
+      arm64-macosx, x86_64-android, arm64-v8a-android, x86-android,
+      armeabi-v7a-android, arm64-iphoneos, x86_64-iphoneos'
     required: true
   version:
-    description: 'The version of the SDK to install'
+    description:
+      'The version of the SDK to install. Use "nightly" for latest develop
+      builds, or a release tag like "v1.0.0".'
     required: true
     default: 'nightly'
   install-dir:
@@ -30,5 +36,5 @@ outputs:
     description: 'The path where the SDK has been installed'
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
